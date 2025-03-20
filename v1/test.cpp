@@ -1,12 +1,14 @@
 #include <vector>
 #include <iostream>
 #include <thread>
+#include <chrono>
 #include "memory_pool.h"
 
 using namespace memorypools;
 
 class P1
 {
+public:
     int test_;
 };
 
@@ -29,7 +31,7 @@ class P4
 void test_memorypool(size_t ntimes, size_t nworks, size_t rounds)
 {
     std::vector<std::thread> vthread(nworks);
-    size_t total_time = 0;
+    auto total_time = 0ns;
 
     for(size_t i = 0 ; i < nworks ; i ++)
     {
@@ -37,7 +39,7 @@ void test_memorypool(size_t ntimes, size_t nworks, size_t rounds)
         {
             for(size_t j = 0; j < rounds; j ++)
             {
-                size_t begint = clock();
+                auto begint = chrono::high_resolution_clock::now();
 
                 for(size_t k = 0; k < ntimes; k ++)
                 {
@@ -51,8 +53,8 @@ void test_memorypool(size_t ntimes, size_t nworks, size_t rounds)
                     deleteElement<P4>(p4);                    
                 }
 
-                size_t endt = clock();
-                total_time += endt - begint;
+                auto endt = chrono::high_resolution_clock::now();
+                total_time += chrono::duration_cast<chrono::nanoseconds> (endt - begint);
             }
         }
         );
@@ -61,7 +63,7 @@ void test_memorypool(size_t ntimes, size_t nworks, size_t rounds)
     for(auto& th : vthread)
         th.join();
     
-    printf("%llu 个线程  执行 %llu 轮  每轮申请&释放 %llu \n总计花费时间 %llu \n", nworks, rounds, ntimes, total_time);
+    printf("%llu 个线程  执行 %llu 轮  每轮申请&释放 %llu \n总计花费时间 < %llu > \n", nworks, rounds, ntimes, total_time.count());
 }
 
 
@@ -70,7 +72,8 @@ void test_newanddelete(size_t ntimes, size_t nworks, size_t rounds)
 {
 
     std::vector<std::thread> vthread(nworks);
-    size_t total_time = 0;
+    
+    auto total_time = 0ns;
 
     for(size_t i = 0 ; i < nworks ; i ++)
     {
@@ -78,7 +81,7 @@ void test_newanddelete(size_t ntimes, size_t nworks, size_t rounds)
         {
             for(size_t j = 0; j < rounds; j ++)
             {
-                size_t begint = clock();
+                auto begint = chrono::high_resolution_clock::now();
 
                 for(size_t k = 0; k < ntimes; k ++)
                 {
@@ -92,8 +95,8 @@ void test_newanddelete(size_t ntimes, size_t nworks, size_t rounds)
                     delete p4;
                 }
 
-                size_t endt = clock();
-                total_time += endt - begint;
+                auto endt = chrono::high_resolution_clock::now();
+                total_time += chrono::duration_cast<chrono::nanoseconds>(endt - begint);
             }
         }
         );
@@ -102,17 +105,17 @@ void test_newanddelete(size_t ntimes, size_t nworks, size_t rounds)
     for(auto& th : vthread)
         th.join();
     
-    printf("%llu 个线程  执行 %llu 轮  每轮申请&释放 %llu 总计花费时间< %llu >\n", nworks, rounds, ntimes, total_time);
+    printf("%llu 个线程  执行 %llu 轮  每轮申请&释放 %llu 总计花费时间< %llu >\n", nworks, rounds, ntimes, total_time.count());
 }
 
 
 int main()
 {
     HashBucket::init_memorypool();
-    test_memorypool(100, 1, 10);
+    test_memorypool(100, 1, 1000);
     std::cout << "-------------------------------------------" << std::endl;
     std::cout << "-------------------------------------------" << std::endl;
-    test_newanddelete(100, 1, 10);
+    test_newanddelete(100, 1, 1000);
 
     return 0;
 }

@@ -89,7 +89,7 @@ namespace memorypools
     // 计算内存对齐填充的字节数
     size_t MemoryPool::paddpoint(char* ptr, size_t align)
     {
-        return (align - reinterpret_cast<size_t>(ptr)) % align;
+        return (align - reinterpret_cast<size_t>(ptr)  % align) % align;
     }
 
 
