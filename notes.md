@@ -185,6 +185,12 @@ namespace mynamespace
 然后使用 mingw32-make 编译 
 
 
+6. 在git管理中想要忽略当前文件 ，即便取消追踪加入 .gitignore文件也不起作用 
+
+原因 在github仓库中可以看见 在notes.md前存在奇怪的符号 ，删除后pull就可以了！！！
+
+
+
 ---
 # 思考
 
